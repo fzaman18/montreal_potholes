@@ -1,4 +1,4 @@
-# Montreal pothole patches: central Montréal, 2024 and 2025
+# Montreal pothole patches: Central Montréal, 2024 and 2025
 
 GEOG 464 Programming for Geospatial Technologies, Fall 2026. A2 MVP. Fariha Zaman.
 
