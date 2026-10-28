@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where Montreal patched potholes in central Montréal, 2024 and 2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <main class="story">
+    <h1>Where Montreal patched potholes in central Montréal, 2024 and 2025</h1>
+    <p class="lede">Montreal's central road crews log the date and GPS position of each pothole-patching stop, then publish the records as one file per year. Those files are hard to read as a picture. This map sets 2024 beside 2025 for central Montréal, with 21,205 stops in all.</p>
+
+    <p><strong>This map is for</strong> a Montreal driver or cyclist planning a route through central Montréal.</p>
+    <p><strong>What we can do here:</strong> switch 2024 and 2025 on and off to compare both years, and click any dot to see the date it was patched.</p>
+
+    <p><strong>Read with care:</strong> the two years do not cover the same months. In the city's files, 2024 has no stops in February, and April 2024 has far fewer stops (2,350) than April 2025 (28,399). More dots for 2025 do not mean the city patched more that year.</p>
+
+    <h2>How to read this map</h2>
+    <ol class="steps">
+      <li><span class="yr">A dot</span>One stop made by a city patching crew, recorded by GPS. One stop can cover several potholes. Some dots sit a few meters off the street most likely due to GPS error</li>
+      <li><span class="yr">A colour</span>The year of the stop: blue for 2024, amber for 2025.</li>
+      <li><span class="yr">A click</span>Shows the date of the stop and links to the city's data.</li>
+    </ol>
+
+    <section class="aside">
+      <h2>Not in this iteration</h2>
+      <p>The whole city, and the other years. The city has published these records since December 2016. This version shows one area and two years, so the file stays small enough to load quickly.</p>
+      <p>Patches per street. Ranking streets means joining these points to the city's street network, a second dataset. That is the next feature.</p>
+      <p>Live data and new reports. The file only records patches already made. Taking reports from the public would need a server.</p>
+
+      <h2>Where this comes from</h2>
+      <p>Patch dates and positions: the City of Montréal's open data portal, <a href="https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule">Travaux de colmatage mécanisé de nid-de-poule des chaussées</a> (Service des infrastructures du réseau routier), licence <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (Attribution), accessed 2 October 2026. I kept 2024 and 2025, the stops inside central Montréal, and each stop's date and year. No rows were missing a location or a date, and 4 rows dated outside 2024 and 2025 were removed. The 2025 records run from 18 January to 20 May 2025.</p>
+      <p class="note">The city's file covers only central crews using mechanized patchers, mostly on main roads. Borough repairs and manual fixes are missing, so a street with no dots may simply not be covered. One dot can stand for several potholes, and the GPS position can be off by a few metres. Nothing here is road-safety or legal advice. Basemap © OpenStreetMap contributors.</p>
+    </section>
+  </main>
+
+  <section class="mapwrap" aria-label="Map of pothole patching stops">
+    <div class="controls">
+      <span class="label">Show:</span>
+      <span id="filters"></span>
+      <button class="chip reset" id="showall" type="button">Show everything</button>
+      <span id="status" class="note" role="status"></span>
+    </div>
+    <div id="map"></div>
+    <div class="panel" id="detail" hidden>
+      <button class="close" id="d-close" type="button" aria-label="Close">&times;</button>
+      <h3 id="d-name"></h3>
+      <p class="status" id="d-status"></p>
+      <p id="d-summary"></p>
+      <a id="d-source" href="#" target="_blank" rel="noopener">About this data</a>
+    </div>
+  </section>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
