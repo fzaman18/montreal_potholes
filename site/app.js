@@ -237,17 +237,18 @@ function clearHighlight() {
   if (selectedLine) { map.removeLayer(selectedLine); selectedLine = null; }
 }
 
-// The stop data never loaded: say so, instead of showing a misleading 0.
+// The whole-area view of the dashboard. If no stops were counted, the stop file never loaded, so say that instead of showing a 0.
+function showWholeArea() {
+  if (whole.total === 0) { showNoData(); return; }
+  renderDashboard("Whole study area", "Central Montréal, every street", whole, "");
+}
+
+// The stop data never loaded: say so in words.
 function showNoData() {
   document.getElementById("dash-title").textContent = "No data";
   document.getElementById("dash-sub").textContent = "";
-  document.getElementById("dash").classList.add("empty");
+  document.getElementById("dash").classList.add("empty");        // hides the big number and the charts (see style.css)
   showMessageOnly("The patch data could not be loaded, so there are no numbers to show. Check your connection and reload the page.");
-}
-
-function showWholeArea() {
-  if (whole.total === 0) { showNoData(); return; }      // 0 stops counted means the file did not load
-  renderDashboard("Whole study area", "Central Montréal, every street", whole, "");
 }
 
 function resetDashboard() {        // what the "Show whole area" button does
@@ -283,6 +284,7 @@ fetch(STREETS_URL)
 
 // 2. EVENT: a click on the map. HANDLER: find the nearest street. UPDATE: highlight it and redraw the dashboard.
 map.on("click", function (e) {
+    if (whole.total === 0) { showNoData(); return; }            // no stop data, so there is nothing to count
   if (streets.length === 0) {
     showMessageOnly("Street counts are not available right now. Reload the page to try again.");
     return;
