@@ -15,8 +15,11 @@
   <main class="story">
     <h1>Where Montreal patched potholes in central Montréal, 2024 and 2025</h1>
         
-    <section class="dash" id="dash" aria-live="polite">
-      <h2 id="dash-title">Whole study area</h2>
+     <section class="dash" id="dash" aria-live="polite">
+      <div class="dash-head">
+        <h2 id="dash-title">Whole study area</h2>
+        <button class="chip reset" id="dash-reset" type="button">Show whole area</button>
+      </div>
       <p class="sub" id="dash-sub">Central Montréal, every street</p>
       <p class="big" id="dash-total">...</p>
       <p class="big-label">patching stops recorded in 2024 and 2025</p>
@@ -29,10 +32,9 @@
       <div class="months" id="dash-months"></div>
       <p class="note key">Blue is 2024, amber is 2025. "No records" means the city's file has no stops anywhere in the area that month. Compare months only where both years have records.</p>
 
-      <button class="chip reset" id="dash-reset" type="button">Show whole area</button>
       <p class="note">274 of the 21,205 stops are more than 30 m from any street. They count in the whole-area total only, so street totals add up to 20,931.</p>
     </section>
-    
+
     <p class="lede">Montreal's central road crews log the date and GPS position of each pothole-patching stop, then publish the records as one file per year. Those files are hard to read as a picture. This map sets 2024 beside 2025 for central Montréal, with 21,205 stops in all.</p>
 
     <p><strong>This map is for</strong> a Montreal driver or cyclist planning a route through central Montréal.</p>

@@ -70,6 +70,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
 .dash .big-label { margin: 2px 0 10px; font-size: 0.9rem; color: #4a5559; }
 .dash .msg { margin: 8px 0; padding: 8px 10px; background: var(--fog); font-size: 0.9rem; }
 .dash .msg[hidden] { display: none; }
+.dash .msg.alert { font-weight: 700; background: #FFF1CC; border-left: 4px solid var(--amber); color: var(--ink); }
 .dash .bar-row { display: grid; grid-template-columns: 2.6rem 1fr 4rem; gap: 8px; align-items: center; margin: 4px 0; font-size: 0.9rem; }
 .dash .bar-track { display: block; height: 18px; background: var(--fog); }
 .dash .bar-fill { display: block; height: 100%; background: var(--c); }
@@ -82,3 +83,17 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
 .dash .nums { color: #4a5559; }
 .dash .nums div::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 4px; background: var(--c); }
 .dash .key { margin: 8px 0 12px; }
+
+/* the dashboard's title row: the street name on the left, the reset button on the right */
+.dash-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 2px; }
+.dash-head h2 { flex: 1 1 10rem; margin: 0; }
+.dash-head .chip { flex-shrink: 0; }
+
+/* when no street is selected, hide the numbers and charts so nothing old is left on screen */
+.dash.empty .big, .dash.empty .big-label, .dash.empty h3, .dash.empty #dash-years, .dash.empty .months, .dash.empty .key { display: none; }
+
+/* the popup that opens beside a clicked dot */
+.stop-popup { border-left: 4px solid var(--c); padding-left: 8px; font-family: var(--sans); font-size: 0.9rem; line-height: 1.4; }
+.stop-popup strong { font-family: var(--serif); font-size: 1rem; }
+.stop-popup p { margin: 4px 0; }
+.stop-popup .status { color: #4a5559; font-size: 0.85rem; }
