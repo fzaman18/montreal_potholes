@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,7 +41,7 @@
     <p><strong>This map is for</strong> a Montreal driver or cyclist planning a route through central Montréal.</p>
     <p><strong>What we can do here:</strong> switch 2024 and 2025 on and off to compare both years, and click any dot to see the date it was patched.</p>
 
-    <p><strong>Read with care:</strong> the two years do not cover the same months. In the city's files, 2024 has no stops in February, and April 2024 has far fewer stops (2,350) than April 2025 (28,399). More dots for 2025 do not mean the city patched more that year.</p>
+        <p><strong>Read with care:</strong> the two years do not cover the same months. In this area, 2024 has no stops in February, April 2024 has only 41 stops against 3,871 in April 2025, and 2025 has none in May. More dots for 2025 do not mean the city patched more that year.</p>
 
     <h2>How to read this map</h2>
     <ol class="steps">
@@ -57,6 +58,7 @@
 
       <h2>Where this comes from</h2>
       <p>Patch dates and positions: the City of Montréal's open data portal, <a href="https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule">Travaux de colmatage mécanisé de nid-de-poule des chaussées</a> (Service des infrastructures du réseau routier), licence <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (Attribution), accessed 2 October 2026. I kept 2024 and 2025, the stops inside central Montréal, and each stop's date and year. No rows were missing a location or a date, and 4 rows dated outside 2024 and 2025 were removed. The 2025 records run from 18 January to 20 May 2025.</p>
+      
       <p class="note">The city's file covers only central crews using mechanized patchers, mostly on main roads. Borough repairs and manual fixes are missing, so a street with no dots may simply not be covered. One dot can stand for several potholes, and the GPS position can be off by a few metres. Nothing here is road-safety or legal advice. Basemap © OpenStreetMap contributors.</p>
     </section>
   </main>
