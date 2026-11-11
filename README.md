@@ -14,7 +14,7 @@ A map of 21,205 pothole-patching stops made by Montreal's central road crews in 
 
 ## Running it
 
-1. I Opened this folder, `montreal-potholes`, in VS Code. The folder itself, not `site`.
+1. I opened this folder, `montreal-potholes`, in VS Code. The folder itself, not `site`.
 2. Put the two city files in `data/` (see the data source below).
 3. Ran `notebooks/mtl_potholes.ipynb` top to bottom. It needs pandas and geopandas. The last check cell prints `All checks passed`.
 4. Right-clicked `site/index.html` and chose Open with Live Server.
@@ -105,3 +105,11 @@ Tool and model: Claude (chat window), Sonnet 5.5
 - Basemap: © OpenStreetMap contributors.
 
 Data used under the Creative Commons Attribution 4.0 licence (CC BY 4.0), credited to Ville de Montréal. My changes are listed under "What the notebook changed".
+
+## After the demo
+
+At my demo, a classmate questioned whether the data is accurate enough, because many dots sit inside buildings instead of on roads. I measured that saving my file moves each dot by at most 5.5 cm, so I concluded it is most likely GPS error in the city's data, but I could not prove it. For the next phase, I am adding the city's street network (Géobase) as a second layer, so that I can match each stop to its nearest street and show counts per street. I plan to move each stop onto its street so the dots no longer sit inside buildings, and I will mention on the page that this tidies the picture but does not make the position more accurate.
+
+## A3 feature: Click a street
+
+For A3 I will add **street-level counts using the city's street network (Géobase)**, so that my reader can click any street segment and see its name and how many patching stops the city logged on it, by year and by month. It has depth because it brings in a second dataset joined to the first (each stop is matched to its nearest street segment in Python), computes counts per segment, and responds to every click. I will know it works when the numbers on the page match my Python check for the same segment. My edge case is a street where nothing was patched.
