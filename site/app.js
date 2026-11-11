@@ -62,10 +62,14 @@ fetch("../data/potholes_2024_2025.geojson")
     document.getElementById("status").textContent =
       shown.toLocaleString("en-CA") + " patching stops shown";
   })
-  .catch(err => {
+    .catch(err => {
     document.getElementById("status").textContent =
-      "The patch data could not be loaded. Open the browser console (F12) to see why.";
-    console.error(err);
+      "The patch data could not be loaded. Check your connection and reload the page.";
+    document.getElementById("dash-title").textContent = "No data";
+    document.getElementById("dash-sub").textContent = "";
+    document.getElementById("dash").classList.add("empty");      // hides the "..." and the empty charts (see style.css)
+    showMessageOnly("The patch data could not be loaded, so there are no numbers to show. Check your connection and reload the page.");
+    console.error(err);                                          // the real cause, for me, in the console (F12)
   });
 
 // The year switches: one chip per year, each switching its layer on or off.
