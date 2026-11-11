@@ -116,3 +116,17 @@ At my demo, a classmate questioned whether the data is accurate enough, because 
 ## A3 feature: Click a street
 
 For A3 I will add **street-level counts using the city's street network (Géobase)**, so that my reader can click any street segment and see its name and how many patching stops the city logged on it, by year and by month. It has depth because it brings in a second dataset joined to the first (each stop is matched to its nearest street segment in Python), computes counts per segment, and responds to every click. I will know it works when the numbers on the page match my Python check for the same segment. My edge case is a street where nothing was patched.
+
+## My three test plans: 
+
+**Test 1**. I click the block of De Maisonneuve Ouest in front of Concordia's Hall Building.
+**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
+**Result**:
+
+**Test 2**. I click that segment, then a segment of a different street, then press "Show whole area".
+**Expected**: after the second click only the new segment is highlighted, and every number and chart is for the new street. After the button, no segment is highlighted and the dashboard shows 21,205 stops (8,764 in 2024, 12,441 in 2025).
+**Result**:
+
+**Test 3**. I click Avenue Maplewood.
+**Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
+**Result**:
