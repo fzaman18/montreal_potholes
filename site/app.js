@@ -96,30 +96,42 @@ document.getElementById("showall").addEventListener("click", () => {
   fitAll();
 });
 
-// 3. The detail panel.
+// 3. The detail popup: opens right beside the dot the reader clicked.
 function showDetail(p, cat, marker) {
-  clearSelected();                                                                // un-highlights the last dot
-  marker.setStyle({ radius: 9, weight: 3, color: "#1A1A1A", fillOpacity: 1 });    // bigger, dark outline
-  marker.bringToFront();                                                          // draws it on top of nearby dots
-  selected = marker;
-  const panel = document.getElementById("detail");
-  panel.style.setProperty("--c", cat.colour);
-  document.getElementById("d-name").textContent = "Pothole patching stop";
-  document.getElementById("d-status").textContent = cat.label + ", on " + p.date;
-  document.getElementById("d-summary").textContent =
-    "A city crew's mechanized patcher logged a stop here. One stop can cover several potholes, and the GPS position can be off by a few metres.";
-  const link = document.getElementById("d-source");
+  clearSelected();                                          // un-highlights the last dot
+
+  // build the popup's contents with textContent, so nothing from the data is ever treated as HTML
+  const box = document.createElement("div");
+  box.className = "stop-popup";
+  box.style.setProperty("--c", cat.colour);                 // the year's colour, as a stripe on the left
+  const title = document.createElement("strong");
+  title.textContent = "Pothole patching stop";
+  const status = document.createElement("p");
+  status.className = "status";
+  status.textContent = cat.label + ", on " + p.date;
+  const summary = document.createElement("p");
+  summary.textContent = "A city crew's mechanized patcher logged a stop here. One stop can cover several potholes, and the GPS position can be off by a few metres.";
+  const link = document.createElement("a");
   link.href = SOURCE_URL;
-  panel.hidden = false;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "About this data";
+  box.append(title, status, summary, link);
+
+  L.popup({ maxWidth: 240, offset: [0, -9] })               // a little above the dot, so it does not cover it
+    .setLatLng(marker.getLatLng())
+    .setContent(box)
+    .openOn(map);                                           // opens next to the dot; any older popup closes
+
+  marker.setStyle({ radius: 9, weight: 3, color: "#1A1A1A", fillOpacity: 1 });   // bigger, dark outline
+  marker.bringToFront();                                    // draws it on top of nearby dots
+  selected = marker;
 }
-function clearSelected() {                                                       //putting highlighted dot back to its normal size and colour
+function clearSelected() {                                  // puts the highlighted dot back to its normal size and colour
   if (selected) selected.setStyle({ radius: 4, weight: 0, fillOpacity: 0.7 });
   selected = null;
 }
-document.getElementById("d-close").addEventListener("click", () => {
-  clearSelected();
-  document.getElementById("detail").hidden = true;
-});
+map.on("popupclose", clearSelected);                        // closing the popup (x, or a click elsewhere) un-highlights the dot
 
 // ============================================================
 // A3 FEATURE: click a street and see its counts (dashboard)
