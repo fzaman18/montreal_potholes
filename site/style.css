@@ -103,4 +103,4 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
   .story { display: flex; flex-direction: column; }
   .story .dash { order: -1; }          /* the dashboard goes first, ahead of the title and the story text */
   #map { height: 50vh; }               /* a slightly shorter map leaves room for the answer below it */
-}
+} 
