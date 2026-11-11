@@ -238,7 +238,8 @@ function showWholeArea() {
 }
 
 function resetDashboard() {        // what the "Show whole area" button does
-  clearHighlight();
+  clearHighlight();                // removes the dark highlight on the street
+  map.closePopup();                // closes a dot's popup too; closing it also shrinks the dot back (see popupclose above)
   showWholeArea();
 }
 document.getElementById("dash-reset").addEventListener("click", resetDashboard);
