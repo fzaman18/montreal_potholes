@@ -41,14 +41,14 @@ I will know it works when the numbers on the page match my Python check for the 
 **Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, and the charts were empty rather than broken.  The red console lines I first saw came from browser extensions (zotero.js and inject.js), not from my files. The console showed no red errors on my live link.
 
 ## How the feature works
- 
+
 All line numbers are in `site/app.js`. The counting per street is done in Python (`notebooks/a3_streets.ipynb`) and saved in `data/streets_central.geojson`. The page only looks the numbers up.
- 
-- **The event, line 280.** `map.on("click", ...)` runs whenever the reader clicks the map.
-- **The handler, lines 281 to 293.** It checks that the stop data and the street file have loaded. It then turns 18 screen pixels into metres at the current zoom (`metresPerPixel`, lines 297 to 299) and keeps that between 10 m and 60 m (line 287), so the click only has to land near a street, about a fingertip away. `nearestStreet` (lines 302 to 316) measures from the click to every piece of every street segment, using `distToPiece` (lines 319 to 325), and keeps the closest one that is within reach. If none is, `showNoStreet` (lines 353 to 359) clears the old highlight and numbers and says so in bold.
-- **The update, lines 328 to 342.** `chooseStreet` removes the old highlight (line 329), draws the chosen segment as a dark line (line 331), reads its counts (lines 333 to 337) and calls `renderDashboard` (line 341). `renderDashboard` (lines 160 to 171) redraws the big number, the yearly bars (`drawYears`, lines 174 to 196) and the monthly bars (`drawMonths`, lines 200 to 230). A month with no stops anywhere in the area shows "no records" instead of a zero.
-- **The streets file, lines 267 to 277.** The same `fetch` pattern as the stops, pointed at `streets_central.geojson`. If it fails, the click handler says so (line 283) and the whole-area numbers still work.
-- **The whole-area view, lines 147 to 157 and 239 to 242.** `countWholeArea` tallies each stop by year and month as the dots load. `showWholeArea` shows those totals, or "No data" if no stop was counted. `resetDashboard` (lines 252 to 257) is what "Show whole area" does: it removes the highlight, closes any popup and shows the whole area again.
+
+- **The event, line 282.** `map.on("click", ...)` runs whenever the reader clicks the map.
+- **The handler, lines 283 to 295.** It checks that the stop data and the street file have loaded (lines 283 to 287). It then turns 18 screen pixels into metres at the current zoom (`metresPerPixel`, lines 299 to 301) and keeps that between 10 m and 60 m (line 289), so the click only has to land near a street, about a fingertip away. `nearestStreet` (lines 304 to 318) measures from the click to every piece of every street segment, using `distToPiece` (lines 321 to 327), and keeps the closest one that is within reach. If none is, `showNoStreet` (lines 355 to 361) clears the old highlight and numbers and says so in bold.
+- **The update, lines 330 to 344.** `chooseStreet` removes the old highlight (line 331), draws the chosen segment as a dark line (line 333), reads its counts (lines 335 to 339) and calls `renderDashboard` (line 343). `renderDashboard` (lines 162 to 173) redraws the big number, the yearly bars (`drawYears`, lines 176 to 198) and the monthly bars (`drawMonths`, lines 202 to 232). A month with no stops anywhere in the area shows "no records" instead of a zero.
+- **The streets file, lines 269 to 279.** The same `fetch` pattern as the stops, pointed at `streets_central.geojson`. If it fails, the click handler says so (line 285) and the whole-area numbers still work.
+- **The whole-area view, lines 149 to 159 and 241 to 244.** `countWholeArea` tallies each stop by year and month as the dots load. `showWholeArea` shows those totals, or "No data" if no stop was counted. `resetDashboard` (lines 254 to 258) is what "Show whole area" does: it removes the highlight, closes any popup and shows the whole area again.
 **One thing I do not yet fully understand:** How to efficiently ingetrate patched pothole data for the entire Island of Montreal across multiple years without slowing down the web map, given the large number of data points involved.
 
 ## Pre-flight report:
@@ -112,7 +112,7 @@ Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a pr
 | Publisher | Ville de Montréal, Service des infrastructures du réseau routier, Division de la géomatique |
 | Link | https://donnees.montreal.ca/dataset/geobase |
 | Licence | Attribution (CC BY 4.0), the City of Montréal's open data licence: https://creativecommons.org/licenses/by/4.0/ |
-| Date accessed | 11 November 2026 (the portal says it is updated weekly) |
+| Date accessed | 10 November 2026 (the portal says it is updated weekly) |
 | File used | `geobase.json` (GeoJSON, 41.1 MB, kept out of GitHub; link above) |
 | Coordinates | Degrees (EPSG:4326); converted to EPSG:2950 for measuring distances |
  
