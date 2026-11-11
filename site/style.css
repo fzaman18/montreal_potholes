@@ -97,3 +97,10 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
 .stop-popup strong { font-family: var(--serif); font-size: 1rem; }
 .stop-popup p { margin: 4px 0; }
 .stop-popup .status { color: #4a5559; font-size: 0.85rem; }
+
+/* on a phone, put the dashboard right under the map so a tapped street's answer is on screen */
+@media (max-width: 860px) {
+  .story { display: flex; flex-direction: column; }
+  .story .dash { order: -1; }          /* the dashboard goes first, ahead of the title and the story text */
+  #map { height: 50vh; }               /* a slightly shorter map leaves room for the answer below it */
+}
