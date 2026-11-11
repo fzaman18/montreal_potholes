@@ -237,7 +237,16 @@ function clearHighlight() {
   if (selectedLine) { map.removeLayer(selectedLine); selectedLine = null; }
 }
 
+// The stop data never loaded: say so, instead of showing a misleading 0.
+function showNoData() {
+  document.getElementById("dash-title").textContent = "No data";
+  document.getElementById("dash-sub").textContent = "";
+  document.getElementById("dash").classList.add("empty");
+  showMessageOnly("The patch data could not be loaded, so there are no numbers to show. Check your connection and reload the page.");
+}
+
 function showWholeArea() {
+  if (whole.total === 0) { showNoData(); return; }      // 0 stops counted means the file did not load
   renderDashboard("Whole study area", "Central Montréal, every street", whole, "");
 }
 
