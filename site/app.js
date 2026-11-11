@@ -260,8 +260,12 @@ fetch(STREETS_URL)
   .then(data => {
     streets = data.features.map(f => ({ p: f.properties, line: f.geometry.coordinates }));   // line = [[lon, lat], ...]
   })
-  .catch(err => {
-    console.error(err);          // the reader is told when they click (see the click handler); the whole-area numbers still work
+    .catch(err => {
+    document.getElementById("status").textContent =
+      "The patch data could not be loaded. Check your connection and reload the page.";
+    document.getElementById("dash-total").textContent = "No data";     // instead of "..." forever
+    showMessageOnly("The patch data could not be loaded, so there are no numbers to show. Check your connection and reload the page.");
+    console.error(err);                                                // the real cause, for me, in the console (F12)
   });
 
 // 2. EVENT: a click on the map. HANDLER: find the nearest street. UPDATE: highlight it and redraw the dashboard.
