@@ -1,39 +1,98 @@
 ## Live link: 
 https://fzaman18.github.io/montreal_potholes/site/
 
-# Montreal pothole patches: Central Montréal, 2024 and 2025
-
-GEOG 464 Programming for Geospatial Technologies, Fall 2026. A2 MVP. Fariha Zaman.
-
-A map of 21,205 pothole-patching stops made by Montreal's central road crews in central Montréal, with switches for 2024 and 2025. It is small on purpose: one area, two years, one map, one story.
-
+# Montreal pothole patches: central Montréal, 2024 and 2025 (after the MVP Demo)
+ 
+GEOG 464 Programming for Geospatial Technologies, Fall 2026. A3: one feature, live, tested. Fariha Zaman.
+ 
+Live map: the link above (opens the map page; the About page is `site/about.html`). Repository: https://github.com/fzaman18/montreal_potholes
+ 
+A map of 21,205 pothole-patching stops made by Montreal's central road crews in central Montréal, with switches for 2024 and 2025, a dashboard of counts by year and by month, and, new in A3, a street click that shows the counts for one street segment. The site has two pages: the map (`site/index.html`) and About (`site/about.html`), which holds the written content and the data notes.
+ 
 ## The five sentences
-
-1. **Problem.** Drivers and cyclists in central Montréal cannot easily see where the city's crews have patched potholes, or how that changed between 2024 and 2025.
+ 
+1. **Problem.** Drivers and cyclists in central Montréal cannot easily see where the city's crews have patched potholes, how that changed between 2024 and 2025, or how many stops were recorded on a given street.
 2. **Audience.** A Montreal driver or cyclist planning a route through central Montréal.
-3. **Core action.** Switch 2024 and 2025 on and off, compare them, and click any dot to see the date it was patched.
-4. **Boundary.** It does not rank streets by patch count, show live potholes, or take new pothole reports.
-5. **Data.** The City of Montréal's records of mechanized pothole patching (GPS position and date), 2024 and 2025. The city's street network (Géobase) is the planned second dataset.
+3. **Core action.** Switch 2024 and 2025 on and off, click any dot to see the date it was patched, and (new in A3) click a street to see how many stops were recorded on it, by year and by month.
+4. **Boundary.** It does not rank streets, show live potholes, or take new pothole reports.
+5. **Data.** The City of Montréal's records of mechanized pothole patching (GPS position and date), 2024 and 2025, and (new in A3) the city's street network (Géobase), used to count stops per street segment.
+## A3 feature: Click a street
+ 
+For A3 I will add street-level counts using the city's street network (Géobase), so that my reader can click any street segment and see its name and how many patching stops the city logged on it, by year and by month.
+It has depth because it brings in a second dataset joined to the first (each stop is matched to its nearest street segment in Python), computes counts per segment, and responds to every click.
+I will know it works when the numbers on the page match my Python check for the same segment. My edge case is a street where nothing was patched.
 
-## Running it
+## My three test plans: 
+ 
+**Test 1.** I click the block of De Maisonneuve Ouest in front of Concordia's Hall Building.
+**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
+**Result**: failed on the first run. The dashboard showed 0 stop for that block. The block of De Maisonneuve Ouest in front of the Hall Building has almost no patching stops, so there was no normal case to check. The page behaved correctly. The fault was in my test: I chose a block without checking that it had stops. I changed the street.
+ 
+**Test 1 (revised).** I click Rue Mackay between Rue Sherbrooke Ouest and Boulevard De Maisonneuve Ouest.
+**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
+**Result**: passed. The page showed Rue Mackay, segment 1260403, with 23 stops (11 in 2024, 12 in 2025). The monthly bars add up (2024: 4 + 7 = 11; 2025: 8 + 2 + 2 = 12), and my Python check gave the same numbers.
+ 
+**Test 2.** I click that segment, then a segment of a different street, then press "Show whole area".
+**Expected**: after the second click only the new segment is highlighted, and every number and chart is for the new street. After the button, no segment is highlighted and the dashboard shows 21,205 stops (8,764 in 2024, 12,441 in 2025).
+**Result**: passed. I clicked Rue Mackay, then De Maisonneuve Ouest. Only the second street stayed highlighted and every number changed. After "Show whole area" the highlight was gone and the dashboard showed 21,205 stops (8,764 in 2024, 12,441 in 2025).
 
-1. I opened this folder, `montreal-potholes`, in VS Code. The folder itself, not `site`.
-2. Put the two city files in `data/` (see the data source below).
-3. Ran `notebooks/mtl_potholes.ipynb` top to bottom. It needs pandas and geopandas. The last check cell prints `All checks passed`.
-4. Right-clicked `site/index.html` and chose Open with Live Server.
+**Test 3**. I click Avenue Maplewood.
+**Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
+**Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, and the charts were empty rather than broken.  The red console lines I first saw came from browser extensions (zotero.js and inject.js), not from my files. The console showed no red errors on my live link.
 
-## The layers
+## How the feature works
+ 
+All line numbers are in `site/app.js`. The counting per street is done in Python (`notebooks/a3_streets.ipynb`) and saved in `data/streets_central.geojson`. The page only looks the numbers up.
+ 
+- **The event, line 280.** `map.on("click", ...)` runs whenever the reader clicks the map.
+- **The handler, lines 281 to 293.** It checks that the stop data and the street file have loaded. It then turns 18 screen pixels into metres at the current zoom (`metresPerPixel`, lines 297 to 299) and keeps that between 10 m and 60 m (line 287), so the click only has to land near a street, about a fingertip away. `nearestStreet` (lines 302 to 316) measures from the click to every piece of every street segment, using `distToPiece` (lines 319 to 325), and keeps the closest one that is within reach. If none is, `showNoStreet` (lines 353 to 359) clears the old highlight and numbers and says so in bold.
+- **The update, lines 328 to 342.** `chooseStreet` removes the old highlight (line 329), draws the chosen segment as a dark line (line 331), reads its counts (lines 333 to 337) and calls `renderDashboard` (line 341). `renderDashboard` (lines 160 to 171) redraws the big number, the yearly bars (`drawYears`, lines 174 to 196) and the monthly bars (`drawMonths`, lines 200 to 230). A month with no stops anywhere in the area shows "no records" instead of a zero.
+- **The streets file, lines 267 to 277.** The same `fetch` pattern as the stops, pointed at `streets_central.geojson`. If it fails, the click handler says so (line 283) and the whole-area numbers still work.
+- **The whole-area view, lines 147 to 157 and 239 to 242.** `countWholeArea` tallies each stop by year and month as the dots load. `showWholeArea` shows those totals, or "No data" if no stop was counted. `resetDashboard` (lines 252 to 257) is what "Show whole area" does: it removes the highlight, closes any popup and shows the whole area again.
+**One thing I do not yet fully understand:** How to efficiently ingetrate patched pothole data for the entire Island of Montreal across multiple years without slowing down the web map, given the large number of data points involved.
 
+## Pre-flight report:
+
+Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a private window, with the F12 tools open.
+ 
+| Check | Result | What I did |
+| --- | --- | --- |
+| 1. Cold start | pass | Opened the live link in a private window with the console open and hard refreshed. The map, dots and dashboard (21,205) loaded and the console had no red lines. |
+| 2. Read every label | pass | Read the text in a dot's popup, a street with stops, a street with no stops, a click in a green space and the whole-area view. No undefined, null, NaN or [object Object] anywhere. |
+| 3. Ask twice | fault found, fixed | Pressing "Show whole area" reset the dashboard and the street highlight but left a clicked dot's popup open and the dot enlarged. Fixed by closing the popup in the reset function (commit "Close the dot popup when Show whole area is pressed (pre-flight check 3)"). Rechecked on the live link: the popup closes and the dot returns to normal size. Clicking a second street or a second dot already replaced the first answer. |
+| 4. The edge | pass | Clicked a green space, zoomed out and clicked, clicked outside my area, and pressed "Show whole area" twice. Each gave a sentence (a bold "No street selected" message) or the whole-area view, with no red errors and no old answer left on screen. |
+| 5. The data does not come | fault found, fixed | Blocking the stop data left the dashboard stuck on "..." with empty charts, and the page told readers to open the console. Fixed so the dashboard says "No data" with a bold message and the page says to check the connection and reload (commit "Tell the reader in words when the patch data does not load (pre-flight check 5)"). A second fault followed: pressing "Show whole area" while the data was missing replaced "No data" with a misleading 0. Fixed so the "No data" message stays (commit "Keep the No data message when Show whole area is pressed without data"). Rechecked on the live link. Blocking the streets file leaves the whole-area numbers working and gives a bold message when a street is clicked. |
+| 6. On a phone (size view and my phone) | fault found, fixed | In the phone-size view (iPhone SE, 375 px) the dashboard sat below the page title, off screen, so tapping a street changed numbers the reader could not see. Fixed in commit "Put the dashboard under the map on phones (pre-flight check 6)". Rechecked in the phone-size view and on my iPhone: the dashboard sits directly under the map, the popup fits the screen, and nothing scrolls sideways. The page title then sat lower on phones, which the page split fixed: the title and one-line instructions now sit in a header above the map.
+| 7. Mouse in my pocket | pass for the controls, known issue for the map | Tab reaches the year chips, Show everything, Show whole area, the map, and the data and licence links. Selecting a dot or a street needs a mouse or a finger, so keyboard users cannot reach the street counts. Next step: a street search box in A4. |
+| 8. Accessibility audit | pass | Lighthouse Accessibility scored 100 on desktop and 100 on mobile, with no failing items to fix. |
+
+ 
+**Known issues.** Dots and streets cannot be selected with the keyboard. "Show whole area" does not zoom the map back out (that is what "Show everything" does). The year chips switch the dots but not the dashboard, which always shows both years. Dots are drawn where the city's GPS put them, so some sit a few metres off the road.
+
+## Pages, files and layers
+ 
 | Layer | File | What it does |
 | --- | --- | --- |
-| Data | `data/remplissage_niddepoule_2024.gpkg`, `data/remplissage_niddepoule_2025.gpkg` | The city's patch records, one file per year, with a date and a GPS position for each stop |
-| Processing | `notebooks/mtl_potholes.ipynb` | Reads both files, counts rows with no location or no date, drops rows outside 2024 and 2025, converts metres to degrees, cuts to one area, writes GeoJSON, then checks the output |
-| Structure | `site/index.html` | The story column, the map, the year switches, the detail panel |
+| Data | `data/potholes_2024_2025.geojson` | 21,205 patching stops in central Montréal, each with a date and a year (3.22 MB) |
+| Data | `data/streets_central.geojson` | 3,237 street segments with their name, ID, road class and the number of stops matched to each, by year and month (1.41 MB) |
+| Data | `data/remplissage_niddepoule_2024.gpkg`, `data/remplissage_niddepoule_2025.gpkg` | The city's patch records as downloaded, one file per year |
+| Processing | `notebooks/mtl_potholes.ipynb` | A2: reads the two years, drops bad rows, converts metres to degrees, cuts to one area, writes the stops GeoJSON, then checks it |
+| Processing | `notebooks/a3_streets.ipynb` | A3: clips the Géobase to the same area, matches each stop to its nearest street segment, counts per segment by year and month, writes and checks the streets GeoJSON |
+| Structure | `site/index.html` | The map page: header, dashboard, year switches and map |
+| Structure | `site/about.html` | The About page: who it is for, how to read it, what is not included, where the data comes from |
 | Presentation | `site/style.css` | Colours taken from the subject: asphalt, steel blue for 2024, amber for 2025 |
-| Behaviour | `site/app.js` | Loads the GeoJSON, draws a dot per stop, builds the year switches, shows the detail panel |
+| Behaviour | `site/app.js` | Draws the dots, builds the year switches, opens the popup, builds the dashboard and handles the street click |
 
-## Data source 
+## Running it
+ 
+1. Opened the folder `montreal-potholes` in VS Code (the folder itself, not `site`).
+2. The Géobase is too big for GitHub (41.1 MB), so it is not in the repository. Downloaded the GeoJSON from https://donnees.montreal.ca/dataset/geobase, saved it as `raw/geobase.json`, and ran `notebooks/a3_streets.ipynb` top to bottom. The last check cells print `PASS` lines and `All checks passed`.
+3. Right-clicked `site/index.html` and choose Open with Live Server.
 
+## Data sources (the receipts)
+ 
+**Pothole stops**
+ 
 | | |
 | --- | --- |
 | Title | Travaux de colmatage mécanisé de nid-de-poule des chaussées (earlier title: Réfection de chaussée par remplissage mécanisé de nid-de-poule) |
@@ -44,107 +103,100 @@ A map of 21,205 pothole-patching stops made by Montreal's central road crews in 
 | Files used | `remplissage_niddepoule_2024.gpkg`, `remplissage_niddepoule_2025.gpkg` (GeoPackage, one per year) |
 | Coordinates | Metres in EPSG:2950 (Montreal's MTM zone 8), converted to degrees (EPSG:4326) with GeoPandas |
 | Coverage | 2024 runs from 17 January to 30 May 2024, with no stops in February. 2025 runs from 18 January to 20 May 2025. |
-
-### What the notebook changed
-
+ 
+**Street network**
+ 
+| | |
+| --- | --- |
+| Title | Géobase - réseau routier |
+| Publisher | Ville de Montréal, Service des infrastructures du réseau routier, Division de la géomatique |
+| Link | https://donnees.montreal.ca/dataset/geobase |
+| Licence | Attribution (CC BY 4.0), the City of Montréal's open data licence: https://creativecommons.org/licenses/by/4.0/ |
+| Date accessed | 11 November 2026 (the portal says it is updated weekly) |
+| File used | `geobase.json` (GeoJSON, 41.1 MB, kept out of GitHub; link above) |
+| Coordinates | Degrees (EPSG:4326); converted to EPSG:2950 for measuring distances |
+ 
+### What the notebooks changed
+ 
+Pothole stops (`mtl_potholes.ipynb`):
+ 
 - Kept only the date, the year and the position of each stop, and dropped the vehicle column.
 - Kept only the stops inside central Montréal, a box with south 45.495, north 45.535, west -73.615 and east -73.555 (degrees).
 - Checked for rows with no location or no date (none were found), and removed rows dated outside 2024 and 2025, counting each removal.
 - Combined 2024 and 2025 into one GeoJSON file with a `year` property.
 
-### Counts
+Streets (`a3_streets.ipynb`):
+ 
+- Clipped the Géobase to the same box (3,253 of 48,034 segments) and kept only the ID, the full street name, the road class and the shape. Trimmed the spaces at the end of street names.
+- Left out tunnel segments (POSITION 7 to 9) when matching stops to streets, because a tunnel lies directly under a surface street and a stop could be matched to the wrong one. 159 of 21,205 stops (0.75%) had a tunnel as their nearest street (113 on Route 136, 46 on an unnamed way). They were matched to the nearest surface street instead, or left unmatched if none was within 30 m. That left 3,237 segments.
+- Matched each stop to its nearest segment with `sjoin_nearest` (in metres, EPSG:2950, searching up to 100 m) and kept the match only if it was within 30 m.
+- Counted the matched stops per segment, by year and by month, and wrote them as fields on the segment (`total`, `y2024`, `y2025` and `m24_1` to `m25_5`).
 
+### Counts
+ 
 | Step | Rows |
 | --- | --- |
-| Read (2024 and 2025 together) | 124,570 |
+| Stops read (2024 and 2025 together) | 124,570 |
 | Dropped: no location or no date | 0 |
 | Dropped: dated outside 2024 and 2025 | 4 |
 | Dropped: outside the central Montréal box | 103,361 |
-| Kept (features in the GeoJSON) | 21,205 |
+| Kept (features in the stops GeoJSON) | 21,205 |
 | Kept in 2024 / kept in 2025 | 8,764 / 12,441 |
-
-GeoJSON file size: 3.22 MB.
+| Stops matched to a street (within 30 m) | 20,931 (8,626 in 2024, 12,305 in 2025) |
+| Stops not matched (farther than 30 m) | 274 |
+| Segments in the streets GeoJSON | 3,237 |
+| Segments with at least one stop / with none | 1,735 / 1,502 |
+ 
+How far the stops are from their nearest street's centre line: 49.4% within 5 m, 78.4% within 10 m, 90.6% within 15 m, 95.2% within 20 m, 98.7% within 30 m, 99.9% within 50 m. The totals add up at every step: 20,931 matched + 274 not matched = 21,205 stops, and the segment counts add up to 20,931.
 
 ## What the data can and cannot show
-
+ 
 From the city's own description of the data:
-
+ 
 - It records only patches made by central road crews with mechanized equipment. Borough repairs and manual repairs are not included.
-- Mechanized patching focuses on arterial (main) roads first, so a street with no dots may simply not be covered.
+- Mechanized patching focuses on arterial (main) roads first, so a street with no dots may simply not be covered. In my area 1,502 of 3,237 segments have no stops.
 - One GPS position can cover several potholes patched from the same spot.
 - GPS accuracy is usually a few metres, but can be tens of metres near tall obstacles.
 - These are raw data without corrections.
-
-From my own check of the files:
-
-- The two years do not cover the same months. In the city's files, 2024 has no stops in February, and April 2024 has 2,350 stops against 28,399 in April 2025. January and March are close in size across the two years. More dots for 2025 do not mean the city patched more that year.
+From my own checks:
+ 
+- The two years do not cover the same months. In my area, 2024 has stops in January, March, April (only 41) and May but none in February, and 2025 has January to April but none in May. More dots for 2025 do not mean the city patched more that year.
+- Matching a stop to a street does not move the dot. A dot can still sit beside the road or inside a building outline. Saving my file moved no point by more than 5.5 cm, so that is GPS error in the city's data, not my processing.
+- Street counts say how many stops were matched to a segment, not how bad the road is.
 
 ## Not in this iteration
 
-- **The whole city and the other years.** The city has published patch records since December 2016. This version shows one area and two years, so the GeoJSON stays under about 5 MB and the page loads quickly.
-- **Patches per street.** Ranking streets needs the city's street network (Géobase) as a second dataset and a join, which comes later in this project.
-- **Live data and new reports.** The file only records patches already made. Taking reports would need a server, which the course does not require at this stage.
+- **The whole city and the other years.** The city has published patch records since December 2016. This version shows one area and two years, so the files stay small enough to load quickly on a phone.
+- **Ranking streets and repeat streets.** The page counts the stops on the segment you click, but does not rank streets or show which were patched in both years.
+- **Street and borough search, and routes.** You can only reach a street by clicking the map.
+- **Moving each dot onto its street.** Planned for A4.
+- **Live data and new reports.** The file only records patches already made.
 - **Severity, status and time of repair.** The data has only a vehicle, a date and time, and a position.
-- **Routes that avoid potholes.** This would need a new algorithm and the street network.
-- **Borough crews and manual repairs.** The city's file leaves them out.
 
 ## Testing evidence
+ 
+A2: the check cell reads the saved file back and prints "All checks passed". The row counts matched at every step. I switched each year on and off, clicked dots and read the date in the popup, and did the stranger test, during which we noticed dots inside buildings. I suspected my own rounding, so I measured how far saving moved the points (5.5 cm). I changed nothing, as the offset is likely GPS error.
+ 
+A3: the three tests above (written and committed before any feature code, with Test 1 revised after it failed once), the segment check in `a3_streets.ipynb`, the `PASS` checks on the streets file, and the pre-flight report.
 
-The check cell reads the saved file back and prints “All checks passed”. The row counts matched at every step. I switched each year on and off, clicked dots which showed the pop-up contents with the date, and did the stranger test with the help of two friends during which we noticed dots inside buildings. I suspected my own rounding, so I measured how far saving moved the points (5.5cm). I changed nothing as the offset is likely a GPS error.
-
-## AI disclosure
-
+## AI disclosure (A3)
+ 
 Lane: Green
 Tool and model: Claude (chat window), Sonnet 5.5
-
-- **What I asked it to do:** I asked the chat assistant for the notebook code one step at a time, and for the year switches (index.html), based on the course samples. It supplied the starting code, including the filter code for the 2024 and 2025 switches, and helped check and change my index.html, app.js and style.css files (screenshots).
-- **What came back, and what I did with it:** I ran every step myself and did not accept everything. I dropped its first set of finished files and started again from my own notebook. I questioned its starter box for the area because it didn’t match my busiest-squares table, so the box was redone around those squares. I didn’t accept the “0 rows dropped” result until I ran extra checks. I tried a month filter, then removed it. I added a short comment on each major step, and a final check cell modelled on Lab 4.
-- **What stayed mine:** The topic, the study area and years, the choice of what to show (selected data points), and all the written content are my own decisions and work.
-
-## Sources
-
-- City of Montréal, Travaux de colmatage mécanisé de nid-de-poule des chaussées: https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule
-- City of Montréal, Géobase, réseau routier (planned second dataset): https://donnees.montreal.ca/dataset/geobase
-- Basemap: © OpenStreetMap contributors.
-
-Data used under the Creative Commons Attribution 4.0 licence (CC BY 4.0), credited to Ville de Montréal. My changes are listed under "What the notebook changed".
+ 
+- **What I asked it to do:** the Chat assistent helped me choose a feature; write the notebook (starting codes for a3_streets) steps one at a time for downloading and clipping the Géobase, matching stops to streets and counting per segment; write the JavaScript for the dashboard, the street click and the popup.
+- **What came back, and what I did with it:** it first suggested a count within 250 m of a click. I chose the street feature using the Géobase instead, and I stayed with the central study box after seeing that the whole island would be about 35 to 45 MB. I asked why tunnels were removed (something I did not understand at first), so it ran a check (159 of 21,205 stops), and I kept the removal. My first Test 1 street had almost no stops, so the test failed; I recorded that and changed the street. I asked for the popup beside the dot, for "Show whole area" at the top of the dashboard and to close the popup, for the "no street" message to be bold and to clear the old numbers, and for the title to come first on phones. I ran the pre-flight checks myself and recorded the faults I found.
+- **How I tested it:** the three tests written before the code, a Python check of one segment against the page, the totals checks in the notebook, the eight Lab 7 checks on the live link, and my iPhone.
+- **What stayed mine:** the topic, the area and years, the decision to add the Géobase, which streets to test, whether each test passed or failed, and the final wording of the page and this README.
 
 ## After the demo
-
-At my demo, a classmate questioned whether the data is accurate enough, because many dots sit inside buildings instead of on roads. I measured that saving my file moves each dot by at most 5.5 cm, so I concluded it is most likely GPS error in the city's data, but I could not prove it. For the next phase, I am adding the city's street network (Géobase) as a second layer, so that I can match each stop to its nearest street and show counts per street. I plan to move each stop onto its street so the dots no longer sit inside buildings, and I will mention on the page that this tidies the picture but does not make the position more accurate.
-
-## A3 feature: Click a street
-
-For A3 I will add **street-level counts using the city's street network (Géobase)**, so that my reader can click any street segment and see its name and how many patching stops the city logged on it, by year and by month. It has depth because it brings in a second dataset joined to the first (each stop is matched to its nearest street segment in Python), computes counts per segment, and responds to every click. I will know it works when the numbers on the page match my Python check for the same segment. My edge case is a street where nothing was patched.
-
-## My three test plans: 
-
-**Test 1**. I click the block of De Maisonneuve Ouest in front of Concordia's Hall Building.
-**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
-**Result**: Result: failed on the first run. The dashboard showed [the number you read] stops for that block. The block of De Maisonneuve Ouest in front of the Hall Building has almost no patching stops, so there was no normal case to check. The page behaved correctly. The fault was in my test: I chose a block without checking that it had stops. I changed the street.
-**Test 1 (revised)**. I click Rue Mackay between Rue Sherbrooke Ouest and Boulevard De Maisonneuve Ouest.
-**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
-**Result**: passed. The page showed Rue Mackay, segment 1260403, with 23 stops (11 in 2024, 12 in 2025). The monthly bars add up (2024: 4 + 7 = 11; 2025: 8 + 2 + 2 = 12), and my Python check gave the same numbers.
-
-**Test 2**. I click that segment, then a segment of a different street, then press "Show whole area".
-**Expected**: after the second click only the new segment is highlighted, and every number and chart is for the new street. After the button, no segment is highlighted and the dashboard shows 21,205 stops (8,764 in 2024, 12,441 in 2025).
-**Result**: passed. I clicked Rue Mackay, then De Maisonneuve Ouest right infront of the Hall building. Only the second street stayed highlighted and every number changed to show 0. After "Show whole area" the highlight was gone and the dashboard showed 21,205 stops (8,764 in 2024, 12,441 in 2025).
-
-**Test 3**. I click Avenue Maplewood.
-**Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
-**Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, and the charts were empty rather than broken. The console showed no red errors.
-
-## Pre-flight report:
-
-Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a private window, with the browser developer tools open, and on my phone.
-
-| Check | Result | What I did |
-| --- | --- | --- |
-| 1. Cold start | pass | Opened the live link in a private window with the console open and hard refreshed. The map, the dots and the dashboard (21,205 stops) loaded, and the console had no red lines. |
-| 2. Read every label | pass | Opened a dot's popup, a street with stops (Rue Mackay), a street with no stops (De Maisonneuve Ouest), a click in a green space, and Show whole area, and read the text in each. No undefined, null, NaN or [object Object] appeared. |
-| 3. Ask twice | fault: Show whole area left a clicked dot's popup open and the dot enlarged | Fixed in commit "Close the dot popup when Show whole area is pressed (pre-flight check 3)" by closing the popup in the reset function. Rechecked on the live link: the popup closes and the dot returns to normal size. The other ask-twice cases passed: a second street click replaces the highlight and every number, and a second dot click closes the first popup. |
-| 4. The edge | pass | Clicked where there is no street, such as green space and open ground, and outside the mapped area. Each click gave "No street selected" with a bold message, and no old answer stayed on screen. Design choice, not a fault: the 2024 and 2025 year chips control only the dots, so the dashboard always shows both years. |
-| 5. The data does not come | fault found, then fixed | Blocking the stop data left the dashboard stuck on "..." with empty charts, and the page told readers to open the console. Now the dashboard says "No data" with a bold message, and the page says to check the connection and reload. A second fault followed: pressing "Show whole area" while the data was missing replaced "No data" with a misleading 0. Fixed so the "No data" message stays (commit "Keep the No data message when Show whole area is pressed without data"). Rechecked on the live link. Blocking the streets file leaves the whole-area numbers working and gives a bold message when a street is clicked. |
-| 6. On a phone (size view and my phone) | fault: the dashboard sat below the page title, off screen, so tapping a street changed numbers the reader could not see | Fixed in commit "Put the dashboard under the map on phones (pre-flight check 6)". Rechecked in the phone-size view and on my iPhone: the dashboard sits directly under the map, the popup fits the screen, and nothing scrolls sideways. Known issue: the page title now sits lower on phones. I plan to fix it in the page split. |
-| 7. Mouse in my pocket | pass for the controls, known issue for the map | Tab reaches the year chips, Show everything, Show whole area, the map, and the data and licence links. Selecting a dot or a street needs a mouse or a finger, so keyboard users cannot reach the street counts. Next step: a street search box in A4. |
-| 8. Accessibility audit | pass | Lighthouse Accessibility scored 100 on desktop and 100 on mobile, with no failing items to fix. |
+ 
+At my demo, a classmate questioned whether the data is accurate enough, because many dots sit inside buildings instead of on roads. I measured that saving my file moves each dot by at most 5.5 cm, so I concluded it is most likely GPS error in the city's data, but I could not prove it.
+For A3 I added the city's street network (Géobase) as a second dataset, so that I could match each stop to its nearest street and show counts per street. I did not move the dots onto the streets; that is planned for A4. The page says that dots are drawn where the city's GPS put them.
+ 
+## Sources
+ 
+- City of Montréal, Travaux de colmatage mécanisé de nid-de-poule des chaussées: https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule
+- City of Montréal, Géobase, réseau routier: https://donnees.montreal.ca/dataset/geobase
+- Basemap: © OpenStreetMap contributors.
+Data used under the Creative Commons Attribution 4.0 licence (CC BY 4.0), credited to Ville de Montréal. My changes are listed under "What the notebooks changed".
