@@ -130,3 +130,5 @@ For A3 I will add **street-level counts using the city's street network (Géobas
 **Test 3**. I click Avenue Maplewood.
 **Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
 **Result**:
+
+## After the demo
