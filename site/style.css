@@ -104,3 +104,24 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
   .story .dash { order: -1; }          /* the dashboard goes first, ahead of the title and the story text */
   #map { height: 50vh; }               /* a slightly shorter map leaves room for the answer below it */
 } 
+
+/* ---- the page split: a map page and an About page ---- */
+body.map-page { display: flex; flex-direction: column; }
+.topbar { flex: none; padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--line); }
+.topbar h1 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 1.2rem; line-height: 1.25; color: var(--asphalt); }
+.topbar p { margin: 4px 0 0; font-size: 0.9rem; }
+.map-page .page { flex: 1 1 auto; min-height: 0; height: auto; grid-template-rows: minmax(0, 1fr); }   /* fills what the header leaves */
+.map-page .story { padding: 16px 16px 32px; }
+.story .foot { margin-top: 4px; }
+
+/* the About page: one readable column */
+body.about-page { height: auto; min-height: 100%; }
+.about-page .story { height: auto; overflow: visible; max-width: 46rem; margin: 0 auto; border-right: 0; min-height: 100vh; }
+
+@media (max-width: 860px) {
+  html, body { height: auto; }
+  body.map-page { display: block; }
+  .map-page .page { grid-template-rows: auto; }
+  .topbar h1 { font-size: 1.05rem; }
+  .about-page .story { display: block; padding: 24px 20px 40px; }
+}
