@@ -60,3 +60,25 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--amber); outline
   #map { height: 62vh; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* A3 dashboard: counts for the whole area, or for the street the reader chose */
+.dash { border: 1px solid var(--line); border-left: 6px solid var(--asphalt); padding: 14px 16px; margin: 0 0 24px; }
+.dash h2 { margin: 0 0 2px; font-size: 1.15rem; }
+.dash h3 { margin: 16px 0 6px; font-family: var(--sans); font-size: 0.95rem; }
+.dash .sub { margin: 0 0 10px; font-size: 0.85rem; color: #4a5559; }
+.dash .big { margin: 0; font-family: var(--serif); font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--asphalt); }
+.dash .big-label { margin: 2px 0 10px; font-size: 0.9rem; color: #4a5559; }
+.dash .msg { margin: 8px 0; padding: 8px 10px; background: var(--fog); font-size: 0.9rem; }
+.dash .msg[hidden] { display: none; }
+.dash .bar-row { display: grid; grid-template-columns: 2.6rem 1fr 4rem; gap: 8px; align-items: center; margin: 4px 0; font-size: 0.9rem; }
+.dash .bar-track { display: block; height: 18px; background: var(--fog); }
+.dash .bar-fill { display: block; height: 100%; background: var(--c); }
+.dash .bar-num { text-align: right; }
+.dash .months { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.dash .month { text-align: center; font-size: 0.8rem; }
+.dash .month-bars { display: flex; justify-content: center; align-items: flex-end; gap: 3px; height: 110px; border-bottom: 1px solid var(--line); }
+.dash .bar { display: block; width: 16px; background: var(--c); }
+.dash .month-name { margin-top: 2px; font-weight: 700; }
+.dash .nums { color: #4a5559; }
+.dash .nums div::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 4px; background: var(--c); }
+.dash .key { margin: 8px 0 12px; }

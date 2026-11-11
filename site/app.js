@@ -54,9 +54,11 @@ fetch("../data/potholes_2024_2025.geojson")
       marker.addTo(layers[key]);
       bounds.extend([lat, lon]);
       shown += 1;
+            countWholeArea(p);                   // A3: tally this stop for the dashboard
     });
     buildFilters();
     fitAll();
+        showWholeArea();                       // A3: fill the dashboard now the data has loaded
     document.getElementById("status").textContent =
       shown.toLocaleString("en-CA") + " patching stops shown";
   })
@@ -118,3 +120,111 @@ document.getElementById("d-close").addEventListener("click", () => {
   clearSelected();
   document.getElementById("detail").hidden = true;
 });
+
+// ============================================================
+// A3 FEATURE: click a street and see its counts (dashboard)
+// ============================================================
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May"];   // the city's files only have January to May
+
+// Counts for the whole study area. countWholeArea adds one stop at a time (it is called from the loader above).
+const whole = { total: 0, y2024: 0, y2025: 0, m24: [0, 0, 0, 0, 0], m25: [0, 0, 0, 0, 0] };
+
+function countWholeArea(p) {
+  const year = Number(p.year);
+  const month = Number(p.date.slice(5, 7)) - 1;      // "2025-04-04": characters 5 to 7 are the month; 0 = January
+  whole.total += 1;
+  if (year === 2024) whole.y2024 += 1;
+  if (year === 2025) whole.y2025 += 1;
+  if (month >= 0 && month < MONTHS.length) {
+    if (year === 2024) whole.m24[month] += 1;
+    if (year === 2025) whole.m25[month] += 1;
+  }
+}
+
+// Draw the whole dashboard from one "counts" object: { total, y2024, y2025, m24: [...], m25: [...] }
+function renderDashboard(title, sub, c, message) {
+  document.getElementById("dash-title").textContent = title;
+  document.getElementById("dash-sub").textContent = sub;
+  document.getElementById("dash-total").textContent = c.total.toLocaleString("en-CA");
+  const msg = document.getElementById("dash-msg");
+  msg.textContent = message || "";
+  msg.hidden = !message;
+  drawYears(c);
+  drawMonths(c);
+}
+
+// The yearly chart: one bar per year. The longest bar fills the track.
+function drawYears(c) {
+  const box = document.getElementById("dash-years");
+  box.textContent = "";                                    // clear the old bars
+  const biggest = Math.max(c.y2024, c.y2025, 1);           // at least 1, so we never divide by 0
+  [["2024", c.y2024, "var(--blue)"], ["2025", c.y2025, "var(--amber)"]].forEach(([label, value, colour]) => {
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    const name = document.createElement("span");
+    name.textContent = label;
+    const track = document.createElement("span");
+    track.className = "bar-track";
+    const fill = document.createElement("span");
+    fill.className = "bar-fill";
+    fill.style.width = (100 * value / biggest) + "%";      // bar length is the value as a share of the biggest
+    fill.style.setProperty("--c", colour);
+    track.appendChild(fill);
+    const num = document.createElement("span");
+    num.className = "bar-num";
+    num.textContent = value.toLocaleString("en-CA");
+    row.append(name, track, num);
+    box.appendChild(row);
+  });
+}
+
+// The monthly chart: for each month, a blue bar (2024) and an amber bar (2025).
+// A month where the city has no records at all for that year shows "no records", not a zero.
+function drawMonths(c) {
+  const box = document.getElementById("dash-months");
+  box.textContent = "";
+  const biggest = Math.max(...c.m24, ...c.m25, 1);
+  MONTHS.forEach((monthName, i) => {
+    const pairs = [[c.m24[i], whole.m24[i], "var(--blue)"], [c.m25[i], whole.m25[i], "var(--amber)"]];
+    const col = document.createElement("div");
+    col.className = "month";
+    const bars = document.createElement("div");
+    bars.className = "month-bars";
+    const nums = document.createElement("div");
+    nums.className = "nums";
+    pairs.forEach(([value, areaValue, colour]) => {
+      const noRecords = areaValue === 0;                   // the whole area has none: the city did not record that month
+      const bar = document.createElement("span");
+      bar.className = "bar";
+      bar.style.setProperty("--c", colour);
+      bar.style.height = (noRecords ? 0 : 100 * value / biggest) + "%";
+      bars.appendChild(bar);
+      const line = document.createElement("div");
+      line.style.setProperty("--c", colour);
+      line.textContent = noRecords ? "no records" : value.toLocaleString("en-CA");
+      nums.appendChild(line);
+    });
+    const label = document.createElement("div");
+    label.className = "month-name";
+    label.textContent = monthName;
+    col.append(bars, label, nums);
+    box.appendChild(col);
+  });
+}
+
+let selectedLine = null;           // the highlight on the map for the chosen street (used from Part D)
+
+function clearHighlight() {
+  if (selectedLine) { map.removeLayer(selectedLine); selectedLine = null; }
+}
+
+function showWholeArea() {
+  renderDashboard("Whole study area", "Central Montréal, every street", whole, "");
+}
+
+function resetDashboard() {        // what the "Show whole area" button does
+  clearHighlight();
+  showWholeArea();
+}
+document.getElementById("dash-reset").addEventListener("click", resetDashboard);
