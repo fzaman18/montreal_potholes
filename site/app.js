@@ -159,7 +159,9 @@ function renderDashboard(title, sub, c, message) {
   document.getElementById("dash-title").textContent = title;
   document.getElementById("dash-sub").textContent = sub;
   document.getElementById("dash-total").textContent = c.total.toLocaleString("en-CA");
+  document.getElementById("dash").classList.remove("empty");     // show the numbers and charts again
   const msg = document.getElementById("dash-msg");
+  msg.className = "msg";                                         // the normal look (showNoStreet makes it bold)
   msg.textContent = message || "";
   msg.hidden = !message;
   drawYears(c);
@@ -240,3 +242,104 @@ function resetDashboard() {        // what the "Show whole area" button does
   showWholeArea();
 }
 document.getElementById("dash-reset").addEventListener("click", resetDashboard);
+
+// ---- Part D: the street click ----
+const STREETS_URL = "../data/streets_central.geojson";
+let streets = [];                 // every street segment: its properties and its line, filled when the file loads
+const PICK_PX = 18;               // how close to a street a click must land, in screen pixels (about a fingertip)
+const PICK_MIN_M = 10;            // but never less than 10 m ...
+const PICK_MAX_M = 60;            // ... and never more than 60 m on the ground
+
+// 1. Load the streets file: the same pattern as the stops above, pointed at the streets.
+fetch(STREETS_URL)
+  .then(response => {
+    if (!response.ok) throw new Error("HTTP " + response.status + " loading streets_central.geojson");
+    return response.json();
+  })
+  .then(data => {
+    streets = data.features.map(f => ({ p: f.properties, line: f.geometry.coordinates }));   // line = [[lon, lat], ...]
+  })
+  .catch(err => {
+    console.error(err);          // the reader is told when they click (see the click handler); the whole-area numbers still work
+  });
+
+// 2. EVENT: a click on the map. HANDLER: find the nearest street. UPDATE: highlight it and redraw the dashboard.
+map.on("click", function (e) {
+  if (streets.length === 0) {
+    showMessageOnly("Street counts are not available right now. Reload the page to try again.");
+    return;
+  }
+  const raw = PICK_PX * metresPerPixel(e.latlng.lat);                  // 18 screen pixels, converted to metres at this zoom
+  const maxMetres = Math.min(Math.max(raw, PICK_MIN_M), PICK_MAX_M);
+  const hit = nearestStreet(e.latlng, maxMetres);
+  if (!hit) {
+    showNoStreet("No street within reach of that click. Zoom in and click on a street.");
+    return;
+  }
+  chooseStreet(hit);
+});
+
+// How many metres one screen pixel covers on the ground at this latitude and zoom.
+function metresPerPixel(lat) {
+  return 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, map.getZoom());
+}
+
+// Find the street segment closest to the click, within maxMetres. Distances are measured on a flat grid centred on the click.
+function nearestStreet(latlng, maxMetres) {
+  const mPerDegLat = 111320;
+  const mPerDegLon = 111320 * Math.cos(latlng.lat * Math.PI / 180);
+  let best = null;
+  let bestDist = maxMetres;
+  streets.forEach(s => {
+    // turn each [lon, lat] point into metres east and north of the click, so the click is at (0, 0)
+    const pts = s.line.map(c => [(c[0] - latlng.lng) * mPerDegLon, (c[1] - latlng.lat) * mPerDegLat]);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const d = distToPiece(pts[i], pts[i + 1]);
+      if (d < bestDist) { bestDist = d; best = s; }
+    }
+  });
+  return best;                                                          // null if nothing was within reach
+}
+
+// Distance from the point (0, 0) to the straight piece of line from a to b.
+function distToPiece(a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  let t = len2 === 0 ? 0 : -(a[0] * dx + a[1] * dy) / len2;             // how far along a to b the closest point lies
+  t = Math.max(0, Math.min(1, t));                                      // keep it on the piece, not on the extended line
+  return Math.hypot(a[0] + t * dx, a[1] + t * dy);
+}
+
+// 3. UPDATE: highlight the chosen segment, then redraw the dashboard with its numbers.
+function chooseStreet(s) {
+  clearHighlight();                                                     // one answer at a time: remove the last highlight
+  const latlngs = s.line.map(c => [c[1], c[0]]);                        // GeoJSON is [lon, lat]; Leaflet wants [lat, lon]
+  selectedLine = L.polyline(latlngs, { color: "#1C2226", weight: 8, opacity: 0.6, interactive: false }).addTo(map);
+  const p = s.p;
+  const counts = {
+    total: p.total, y2024: p.y2024, y2025: p.y2025,
+    m24: [p.m24_1, p.m24_2, p.m24_3, p.m24_4, p.m24_5],
+    m25: [p.m25_1, p.m25_2, p.m25_3, p.m25_4, p.m25_5]
+  };
+  const message = p.total === 0
+    ? "No patching stops were recorded on this street in 2024 or 2025. The city's file only covers central crews on main roads, so this does not mean the road is in good condition."
+    : "";
+  renderDashboard(p.name, "Street segment " + p.id + " (one block between intersections)", counts, message);
+}
+
+// A bold note in the dashboard that leaves the numbers as they were (used when the street file did not load).
+function showMessageOnly(text) {
+  const msg = document.getElementById("dash-msg");
+  msg.className = "msg alert";
+  msg.textContent = text;
+  msg.hidden = false;
+}
+
+// The click landed on no street: clear the old highlight and the old numbers, and say so in bold.
+function showNoStreet(text) {
+  clearHighlight();
+  document.getElementById("dash-title").textContent = "No street selected";
+  document.getElementById("dash-sub").textContent = "";
+  document.getElementById("dash").classList.add("empty");        // hides the big number and the charts (see style.css)
+  showMessageOnly(text);
+}
