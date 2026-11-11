@@ -121,14 +121,17 @@ For A3 I will add **street-level counts using the city's street network (Géobas
 
 **Test 1**. I click the block of De Maisonneuve Ouest in front of Concordia's Hall Building.
 **Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
-**Result**:
+**Result**: Result: failed on the first run. The dashboard showed [the number you read] stops for that block. The block of De Maisonneuve Ouest in front of the Hall Building has almost no patching stops, so there was no normal case to check. The page behaved correctly. The fault was in my test: I chose a block without checking that it had stops. I changed the street.
+**Test 1 (revised)**. I click Rue Mackay between Rue Sherbrooke Ouest and Boulevard De Maisonneuve Ouest.
+**Expected**: only that segment is highlighted. The panel shows the street name, with the segment's ID number in small print. The big number is the stops matched to that segment. The 2024 and 2025 bars add up to it, and so do the monthly bars. My Python check gives the same total for that segment ID.
+**Result**: passed. The page showed Rue Mackay, segment 1260403, with 23 stops (11 in 2024, 12 in 2025). The monthly bars add up (2024: 4 + 7 = 11; 2025: 8 + 2 + 2 = 12), and my Python check gave the same numbers.
 
 **Test 2**. I click that segment, then a segment of a different street, then press "Show whole area".
 **Expected**: after the second click only the new segment is highlighted, and every number and chart is for the new street. After the button, no segment is highlighted and the dashboard shows 21,205 stops (8,764 in 2024, 12,441 in 2025).
-**Result**:
+**Result**: passed. I clicked Rue Mackay, then De Maisonneuve Ouest right infront of the Hall building. Only the second street stayed highlighted and every number changed to show 0. After "Show whole area" the highlight was gone and the dashboard showed 21,205 stops (8,764 in 2024, 12,441 in 2025).
 
 **Test 3**. I click Avenue Maplewood.
 **Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
-**Result**:
+**Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, the charts were empty. The red console lines came from browser extensions (zotero.js and inject.js), not from my files.
 
 ## After the demo
