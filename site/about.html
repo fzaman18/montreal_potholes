@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About this map: Montreal pothole patches</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="about-page">
+
+<main class="story">
+  <p><a href="index.html">Back to the map</a></p>
+  <h1>About this map and its data</h1>
+
+  <p class="lede">Montreal's central road crews log the date and GPS position of each pothole-patching stop, then publish the records as one file per year. Those files are hard to read as a picture. This map sets 2024 beside 2025 for central Montréal, with 21,205 stops in all.</p>
+
+  <p><strong>This map is for</strong> a Montreal driver or cyclist planning a route through central Montréal.</p>
+  <p><strong>What you can do here:</strong> switch 2024 and 2025 on and off to compare both years, and click any dot to see the date it was patched.</p>
+
+  <p><strong>Read with care:</strong> the two years do not cover the same months. In this area, 2024 has no stops in February, April 2024 has only 41 stops against 3,871 in April 2025, and 2025 has none in May. More dots for 2025 do not mean the city patched more that year.</p>
+
+  <h2>How to read this map</h2>
+  <ol class="steps">
+    <li><span class="yr">A dot</span>One stop made by a city patching crew, recorded by GPS. One stop can cover several potholes. Some dots sit a few metres off the street, most likely because of GPS error.</li>
+    <li><span class="yr">A colour</span>The year of the stop: blue for 2024, amber for 2025.</li>
+    <li><span class="yr">A click</span>Shows the date of the stop and links to the city's data.</li>
+  </ol>
+
+  <section class="aside">
+    <h2>Not in this iteration</h2>
+    <p>The whole city and the other years. The city has published these records since December 2016. This version shows one area and two years, so the files stay small enough to load quickly on a phone.</p>
+    <p>Ranking streets. This version counts the stops on the street segment you click, but it does not rank streets or show which ones were patched in both years.</p>
+    <p>Street and borough search. You can only reach a street by clicking the map.</p>
+    <p>Moving each dot onto its street. Dots are drawn where the city's GPS put them, so some sit a few metres off the road. Each stop is matched to its nearest street segment for the street counts, which does not move the dot.</p>
+    <p>Live data and new reports. The file only records patches already made. Taking reports from the public would need a server.</p>
+
+    <h2>Where this comes from</h2>
+    <p>Patch dates and positions: the City of Montréal's open data portal, <a href="https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule">Travaux de colmatage mécanisé de nid-de-poule des chaussées</a> (Service des infrastructures du réseau routier), licence <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (Attribution), accessed 2 October 2026. I kept 2024 and 2025, the stops inside central Montréal, and each stop's date and year. No rows were missing a location or a date, and 4 rows dated outside 2024 and 2025 were removed. The 2025 records run from 18 January to 20 May 2025.</p>
+    <p>Streets: the City of Montréal's <a href="https://donnees.montreal.ca/dataset/geobase">Géobase, réseau routier</a> (Service des infrastructures du réseau routier, Division de la géomatique), licence <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (Attribution), accessed 10 November 2026. I kept the segments inside central Montréal and left out tunnels. Each stop is matched to its nearest street segment within 30 m. 274 of the 21,205 stops were farther than that and are counted only in the whole-area total. 159 stops had a tunnel as their nearest street and were matched to the nearest surface street instead, or left unmatched if none was within 30 m.</p>
+    <p class="note">The city's file covers only central crews using mechanized patchers, mostly on main roads. Borough repairs and manual fixes are missing, so a street with no dots may simply not be covered. One dot can stand for several potholes, and the GPS position can be off by a few metres. Nothing here is road-safety or legal advice. Basemap © OpenStreetMap contributors.</p>
+  </section>
+
+  <p><a href="index.html">Back to the map</a></p>
+</main>
+
+</body>
+</html>
