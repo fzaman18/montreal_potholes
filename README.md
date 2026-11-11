@@ -132,6 +132,19 @@ For A3 I will add **street-level counts using the city's street network (Géobas
 
 **Test 3**. I click Avenue Maplewood.
 **Expected**: that segment is highlighted and the big number says 0. A plain sentence says no stops were recorded on this street in 2024 or 2025, and that the file only covers central crews on main roads, so this does not mean the road is in good condition. The charts show as empty, not broken, and the console (the F12 error panel) shows no red errors.
-**Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, the charts were empty. The red console lines came from browser extensions (zotero.js and inject.js), not from my files.
+**Result**: passed. I clicked Avenue Maplewood (segment 1604144). It was highlighted, the big number was 0, the sentence about main roads appeared, and the charts were empty rather than broken. The console showed no red errors.
 
-## After the demo
+## Pre-flight report:
+
+Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a private window, with the browser developer tools open, and on my phone.
+
+| Check | Result | What I did |
+| --- | --- | --- |
+| 1. Cold start | pass | Opened the live link in a private window with the console open and hard refreshed. The map, the dots and the dashboard (21,205 stops) loaded, and the console had no red lines. |
+| 2. Read every label | pass | Opened a dot's popup, a street with stops (Rue Mackay), a street with no stops (De Maisonneuve Ouest), a click in a green space, and Show whole area, and read the text in each. No undefined, null, NaN or [object Object] appeared. |
+| 3. Ask twice | fault: Show whole area left a clicked dot's popup open and the dot enlarged | Fixed in commit "Close the dot popup when Show whole area is pressed (pre-flight check 3)" by closing the popup in the reset function. Rechecked on the live link: the popup closes and the dot returns to normal size. The other ask-twice cases passed: a second street click replaces the highlight and every number, and a second dot click closes the first popup. |
+| 4. The edge | pass | Clicked where there is no street, such as green space and open ground, and outside the mapped area. Each click gave "No street selected" with a bold message, and no old answer stayed on screen. Design choice, not a fault: the 2024 and 2025 year chips control only the dots, so the dashboard always shows both years. |
+| 5. The data does not come | fault: with the stop data blocked, the dashboard stayed on "..." and the message told readers to open the console | Fixed in commit "Tell the reader in words when the patch data does not load (pre-flight check 5)". The dashboard now says "No data" with a bold message, and the page says to check the connection and reload. With the streets file blocked, the whole-area numbers still show and clicking gives a bold message. |
+| 6. On a phone (size view and my phone) | fault: the dashboard sat below the page title, off screen, so tapping a street changed numbers the reader could not see | Fixed in commit "Put the dashboard under the map on phones (pre-flight check 6)". Rechecked in the phone-size view and on my iPhone: the dashboard sits directly under the map, the popup fits the screen, and nothing scrolls sideways. Known issue: the page title now sits lower on phones. I plan to fix it in the page split. |
+| 7. Mouse in my pocket | pass for the controls, known issue for the map | Tab reaches the year chips, Show everything, Show whole area, the map, and the data and licence links. Selecting a dot or a street needs a mouse or a finger, so keyboard users cannot reach the street counts. Next step: a street search box in A4. |
+| 8. Accessibility audit | pass | Lighthouse Accessibility scored 100 on desktop and 100 on mobile, with no failing items to fix. |
