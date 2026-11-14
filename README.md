@@ -51,6 +51,33 @@ All line numbers are in `site/app.js`. The counting per street is done in Python
 - **The whole-area view, lines 149 to 159 and 241 to 244.** `countWholeArea` tallies each stop by year and month as the dots load. `showWholeArea` shows those totals, or "No data" if no stop was counted. `resetDashboard` (lines 254 to 258) is what "Show whole area" does: it removes the highlight, closes any popup and shows the whole area again.
 **One thing I do not yet fully understand:** How to efficiently ingetrate patched pothole data for the entire Island of Montreal across multiple years without slowing down the web map, given the large number of data points involved.
 
+## Usability test and my one fix (A3 Part 3)
+ 
+On Wednesday 11 November I tested the live map with four people: two classmates one-on-one on their phones (about 20 minutes each), and two more in a rapid round on a laptop. The full findings table, with evidence and severity ratings, is in `A3_Part3_Zaman.docx`. In short:
+ 
+| # | What I saw | Severity | What I did |
+| --- | --- | --- | --- |
+| 1 | Users 2, 3 and 4 took about 2 minutes to notice that a street can be clicked. | 2 | **Fixed (part 1 of the one fix).** |
+| 2 | On a phone, User 1 took about 5 minutes and User 2 about 3 minutes to notice the dashboard below the map. | 2 | **Fixed (part 2 of the one fix).** |
+| 3 | All four testers wanted a street search bar. | 2 | Later (A4). |
+| 4 | Users 3 and 4 found the dots too small to click at maximum zoom. | 2 | Later. |
+| 5 | All four testers asked for the dots to sit inside the streets and for the whole Island to be covered. | 2 | Later (A4). |
+| 6 | Users 1, 2 and 4 never pressed "Show whole area". User 3 understood it at about 6 minutes. | 1 | Later (A4). |
+ 
+What worked: when I asked for a first impression, all four testers said almost immediately that the map shows pothole patches in central Montréal over two years, for drivers or cyclists, and Users 1, 2 and 3 added that it could help residents raise concerns regarding street conditions with their borough and help city planners. Every tester found Rue Mackay (2 to 3 minutes), and the two testers who filled in the SUS gave scores of 75 and 90.
+ 
+**My one fix.** Findings 1 and 2 are one problem: the reader cannot find the street counts. So my one fix has two parts that only work together. In Part H of my test plan I had already chosen a hint in the page header as my fix if testers missed the street click, and they did.
+ 
+- **Part 1, the header (`site/index.html`, line 17).** Before: "Switch 2024 and 2025 on and off above the map, and click any dot to see the date it was patched." After: "Switch 2024 and 2025 on and off above the map, click any dot to see the date it was patched, or click a street to see how many stops were recorded on that block."
+- **Part 2, the phone layout (`site/style.css`, lines 129 to 138, a new block at the end of the file).** On screens 860 px wide or less, the map is shorter (34% of the screen height, never under 220 px), and the header text, buttons and spacing are smaller. This replaces the 360 px minimum height that the map had on phones, so the heading and the big number of the dashboard now show under the map without scrolling.
+I changed nothing else on the live map.
+ 
+| Before (my iPhone, Wednesday) | After (my iPhone, after the fix) |
+| --- | --- |
+| ![The live page on a phone before the fix: the header does not mention streets](screenshots/before_header_phone.jpg) | ![The live page on a phone after the fix: the header says to click a street](screenshots/after_header_phone.jpg) |
+ 
+The brief asks for one improvement, so I held back the other findings (rows 3 to 6). They are my starting list for A4: a street search box, dots moved onto the streets, the whole Island, bigger dots, planning routes, a "Show whole area" button that zooms out, and "Show everything" renamed "Show all years" which does not reset the map to starting zoom.
+
 ## Pre-flight report:
 
 Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a private window, with the F12 tools open.
@@ -187,11 +214,12 @@ Tool and model: Claude (chat window), Sonnet 5.5
 - **What I asked it to do:** the Chat assistent helped me choose a feature; write the notebook (starting codes for a3_streets) steps one at a time for downloading and clipping the Géobase, matching stops to streets and counting per segment; write the JavaScript for the dashboard, the street click and the popup.
 - **What came back, and what I did with it:** it first suggested a count within 250 m of a click. I chose the street feature using the Géobase instead, and I stayed with the central study box after seeing that the whole island would be about 35 to 45 MB. I asked why tunnels were removed (something I did not understand at first), so it ran a check (159 of 21,205 stops), and I kept the removal. My first Test 1 street had almost no stops, so the test failed; I recorded that and changed the street. I asked for the popup beside the dot, for "Show whole area" at the top of the dashboard and to close the popup, for the "no street" message to be bold and to clear the old numbers, and for the title to come first on phones. I ran the pre-flight checks myself and recorded the faults I found.
 - **How I tested it:** the three tests written before the code, a Python check of one segment against the page, the totals checks in the notebook, the eight Lab 7 checks on the live link, and my iPhone.
-- **What stayed mine:** the topic, the area and years, the decision to add the Géobase, which streets to test, whether each test passed or failed, and the final wording of the page and this README.
+- **A3 Part 3 (usability test and fix):** I ran the sessions and took the notes myself, and then used my notes to develope the findings table with severity ratings, and to draft this README update. I decided to make one key improvement: edit the header sentence to include the line about clicking a street to see how many stops were recorded for that block/street segment; and change the phone layout in style.css with the help of chat assistant, which fixed the problem. All other changes will come later (A4).
+- **What stayed mine:** the topic, the area and years, the decision to add the Géobase, which streets to test, whether each test passed or failed, the testing itself, which fix to make, and all the writting of the pages and this README.
 
 ## After the demo
  
-At my demo, a classmate questioned whether the data is accurate enough, because many dots sit inside buildings instead of on roads. I measured that saving my file moves each dot by at most 5.5 cm, so I concluded it is most likely GPS error in the city's data, but I could not prove it.
+At my MVP demo, a classmate questioned whether the data is accurate enough, because many dots sit inside buildings instead of on roads. I measured that saving my file moves each dot by at most 5.5 cm, so I concluded it is most likely GPS error in the city's data, but I could not prove it.
 For A3 I added the city's street network (Géobase) as a second dataset, so that I could match each stop to its nearest street and show counts per street. I did not move the dots onto the streets; that is planned for A4. The page says that dots are drawn where the city's GPS put them.
  
 ## Sources
