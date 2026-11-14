@@ -120,6 +120,8 @@ Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a pr
  
 **Pothole stops**
  
+| Item | Detail |
+| --- | --- |
 | Title | Travaux de colmatage mécanisé de nid-de-poule des chaussées (earlier title: Réfection de chaussée par remplissage mécanisé de nid-de-poule) |
 | Publisher | Ville de Montréal, Service des infrastructures du réseau routier |
 | Link | https://donnees.montreal.ca/dataset/refection-de-chaussee-par-remplissage-mecanise-de-nid-de-poule |
@@ -131,6 +133,8 @@ Run on my live link (https://fzaman18.github.io/montreal_potholes/site/) in a pr
  
 **Street network**
  
+| Item | Detail |
+| --- | --- |
 | Title | Géobase - réseau routier |
 | Publisher | Ville de Montréal, Service des infrastructures du réseau routier, Division de la géomatique |
 | Link | https://donnees.montreal.ca/dataset/geobase |
