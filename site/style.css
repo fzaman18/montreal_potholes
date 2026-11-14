@@ -125,3 +125,14 @@ body.about-page { height: auto; min-height: 100%; }
   .topbar h1 { font-size: 1.05rem; }
   .about-page .story { display: block; padding: 24px 20px 40px; }
 }
+
+/* A3 Part 3 fix: on a phone, make the top of the dashboard visible under the map without scrolling */
+@media (max-width: 860px) {
+  .topbar { padding: 8px 16px; }
+  .topbar p { font-size: 0.85rem; margin-top: 2px; }
+  .controls { padding: 8px 16px; gap: 6px; }
+  .chip { font-size: 0.85rem; padding: 3px 10px 3px 26px; }
+  .chip.reset { padding-left: 10px; }
+  #map { height: 34vh; min-height: 220px; }     /* min-height replaces the 360px floor set earlier in this file */
+  .map-page .story { padding-top: 12px; }
+}
