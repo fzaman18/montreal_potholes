@@ -60,7 +60,7 @@ On Wednesday 11 November I tested the live map with four people: two classmates 
 | 1 | Users 2, 3 and 4 took about 2 minutes to notice that a street can be clicked. | 2 | **Fixed (part 1 of the one fix).** |
 | 2 | On a phone, User 1 took about 5 minutes and User 2 about 3 minutes to notice the dashboard below the map. | 2 | **Fixed (part 2 of the one fix).** |
 | 3 | All four testers wanted a street search bar. | 2 | Later (A4). |
-| 4 | Users 3 and 4 found the dots too small to click at maximum zoom. | 2 | Later. |
+| 4 | Users 3 and 4 found the dots too small to click at maximum zoom. | 2 | Later (A4). |
 | 5 | All four testers asked for the dots to sit inside the streets and for the whole Island to be covered. | 2 | Later (A4). |
 | 6 | Users 1, 2 and 4 never pressed "Show whole area". User 3 understood it at about 6 minutes. | 1 | Later (A4). |
  
